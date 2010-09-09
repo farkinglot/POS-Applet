@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <display-name>Servlet 2.4 Examples</display-name>
+    <description>
+      Servlet 2.4 Examples.
+    </description>
+
+    <!-- Define servlets that are included in the application -->
+
+    <servlet>
+        <servlet-name>checkAccount</servlet-name>
+        <servlet-class>checkAccount</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>checkUserAccess</servlet-name>
+        <servlet-class>checkUserAccess</servlet-class>
+    </servlet>
+
+   <servlet>
+        <servlet-name>getBrand</servlet-name>
+        <servlet-class>getBrand</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>getDataServlet</servlet-name>
+        <servlet-class>getDataServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>getTransaction</servlet-name>
+        <servlet-class>getTransaction</servlet-class>
+    </servlet>
+  
+    <servlet>
+        <servlet-name>getValue</servlet-name>
+        <servlet-class>getValue</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>printerFlag</servlet-name>
+        <servlet-class>printerFlag</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>processVoiding</servlet-name>
+        <servlet-class>processVoiding</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>transServlet</servlet-name>
+        <servlet-class>transServlet</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>validateTransaction</servlet-name>
+        <servlet-class>validateTransaction</servlet-class>
+    </servlet>
+ 
+    <servlet>
+        <servlet-name>voidTransaction</servlet-name>
+        <servlet-class>voidTransaction</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>checkSession</servlet-name>
+        <servlet-class>checkSession</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>saveData</servlet-name>
+        <servlet-class>saveData</servlet-class>
+    </servlet>
+
+    
+    <servlet-mapping>
+        <servlet-name>checkAccount</servlet-name>
+        <url-pattern>/servlet/checkAccount</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>checkUserAccess</servlet-name>
+        <url-pattern>/servlet/checkUserAccess</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>getBrand</servlet-name>
+        <url-pattern>/servlet/getBrand</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>getDataServlet</servlet-name>
+        <url-pattern>/servlet/getDataServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>getTransaction</servlet-name>
+        <url-pattern>/servlet/getTransaction</url-pattern>
+    </servlet-mapping>
+    
+     <servlet-mapping>
+        <servlet-name>getValue</servlet-name>
+        <url-pattern>/servlet/getValue</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>printerFlag</servlet-name>
+        <url-pattern>/servlet/printerFlag</url-pattern>
+    </servlet-mapping>
+ 	
+    <servlet-mapping>
+        <servlet-name>processVoiding</servlet-name>
+        <url-pattern>/servlet/processVoiding</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>transServlet</servlet-name>
+        <url-pattern>/servlet/transServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>validateTransaction</servlet-name>
+        <url-pattern>/servlet/validateTransaction</url-pattern>
+    </servlet-mapping>
+
+   <servlet-mapping>
+        <servlet-name>voidTransaction</servlet-name>
+        <url-pattern>/servlet/voidTransaction</url-pattern>
+    </servlet-mapping>
+
+     <servlet-mapping>
+        <servlet-name>checkSession</servlet-name>
+        <url-pattern>/servlet/checkSession</url-pattern>
+    </servlet-mapping>
+
+     <servlet-mapping>
+        <servlet-name>saveData</servlet-name>
+        <url-pattern>/servlet/saveData</url-pattern>
+    </servlet-mapping>
+
+
+    <security-constraint>
+      <display-name>Example Security Constraint</display-name>
+      <web-resource-collection>
+         <web-resource-name>Protected Area</web-resource-name>
+	 <!-- Define the context-relative URL(s) to be protected -->
+         <url-pattern>/jsp/security/protected/*</url-pattern>
+	 <!-- If you list http methods, only those methods are protected -->
+	 <http-method>DELETE</http-method>
+         <http-method>GET</http-method>
+         <http-method>POST</http-method>
+	 <http-method>PUT</http-method>
+      </web-resource-collection>
+      <auth-constraint>
+         <!-- Anyone with one of the listed roles may access this area -->
+         <role-name>tomcat</role-name>
+	 <role-name>role1</role-name>
+      </auth-constraint>
+    </security-constraint>
+
+    <!-- Default login configuration uses form-based authentication -->
+    <login-config>
+      <auth-method>FORM</auth-method>
+      <realm-name>Example Form-Based Authentication Area</realm-name>
+      <form-login-config>
+        <form-login-page>/jsp/security/protected/login.jsp</form-login-page>
+        <form-error-page>/jsp/security/protected/error.jsp</form-error-page>
+      </form-login-config>
+    </login-config>
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+      <role-name>role1</role-name>
+    </security-role>
+    <security-role>
+      <role-name>tomcat</role-name>
+    </security-role>
+
+    <!-- Environment entry examples -->
+    <!--env-entry>
+      <env-entry-description>
+         The maximum number of tax exemptions allowed to be set.
+      </env-entry-description>
+      <env-entry-name>maxExemptions</env-entry-name>
+      <env-entry-value>15</env-entry-value>
+      <env-entry-type>java.lang.Integer</env-entry-type>
+    </env-entry-->
+    <env-entry>
+      <env-entry-name>minExemptions</env-entry-name>
+      <env-entry-value>1</env-entry-value>
+      <env-entry-type>java.lang.Integer</env-entry-type>
+    </env-entry>
+    <env-entry>
+      <env-entry-name>foo/name1</env-entry-name>
+      <env-entry-value>value1</env-entry-value>
+      <env-entry-type>java.lang.String</env-entry-type>
+    </env-entry>
+    <env-entry>
+      <env-entry-name>foo/bar/name2</env-entry-name>
+      <env-entry-value>true</env-entry-value>
+      <env-entry-type>java.lang.Boolean</env-entry-type>
+    </env-entry>
+    <env-entry>
+      <env-entry-name>name3</env-entry-name>
+      <env-entry-value>1</env-entry-value>
+      <env-entry-type>java.lang.Integer</env-entry-type>
+    </env-entry>
+    <env-entry>
+      <env-entry-name>foo/name4</env-entry-name>
+      <env-entry-value>10</env-entry-value>
+      <env-entry-type>java.lang.Integer</env-entry-type>
+    </env-entry>
+
+</web-app>
