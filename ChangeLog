@@ -1,6 +1,10 @@
 This is the ChangeLog file for the Guest Portal. Verbose commit log messages
 should be written here.
 
+2010-09-13: Ridvan Baluyos <ridvan@baluyos.net>
+    Build 1:
+        Added properties file. Application is now config-driven.
+
 2010-09-09: Ridvan Baluyos <ridvan@baluyos.net>
     Build 1:
         Initial import of POS Applet project.

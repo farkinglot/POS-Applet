@@ -6,14 +6,44 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Properties;
+
 import javax.swing.*;
 
 public class ScreenC extends JPanel
     implements ActionListener
 {
-
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
+	String _serverName;
+	String _serverPath;
+	String _projectName;
+	
     public ScreenC()
     {
+    	try
+        {
+        	_properties = new Properties();
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_projectName = _properties.getProperty("PROJECT_NAME");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");
+        	_projectName = _properties.getProperty("PROJECT_NAME");
+        	_serverName = _properties.getProperty("SERVER_NAME");
+        	_serverPath = _properties.getProperty("SERVER_PATH");
+        	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+        
         gd = new getData();
         totalRows = 0;
         setLayout(new BorderLayout());
@@ -49,7 +79,7 @@ public class ScreenC extends JPanel
 
     public void actionPerformed(ActionEvent actionevent)
     {
-        String s = gd.getData("http://192.168.0.112:8080/oakwood/servlet/checkSession", "sess");
+        String s = gd.getData(_serverPath + "/" + _serverName + "/checkSession", "sess");
         if(s.trim().compareTo("true") == 0)
         {
             if(actionevent.getSource() == buttonA)
@@ -58,7 +88,7 @@ public class ScreenC extends JPanel
                 Object obj = null;
                 if(inputValue2.compareTo("") != 0)
                 {
-                    String s1 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/voidTransaction", "raduser", inputValue2, "3600");
+                    String s1 = gd.getData(_serverPath + "/" + _serverName + "/voidTransaction", "raduser", inputValue2, "3600");
                     if(s1.trim().compareTo("1") == 0)
                         JOptionPane.showMessageDialog(null, "User is currently online, account cannot be voided", "Error", 0);
                     else
@@ -86,7 +116,7 @@ public class ScreenC extends JPanel
                 Object obj1 = null;
                 if(inputValue.compareTo("") != 0)
                 {
-                    String s2 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/validateTransaction", "raduser", inputValue);
+                    String s2 = gd.getData(_serverPath + "/" + _serverName + "/validateTransaction", "raduser", inputValue);
                     if(s2.compareTo("true") == 0)
                     {
                         resultPanel.removeAll();
@@ -135,8 +165,8 @@ public class ScreenC extends JPanel
     public Container displayTransaction(String s, String s1)
     {
         transaction = s;
-        String s2 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/transServlet", "raduser", s, "display");
-        result = gd.getData("http://192.168.0.112:8080/oakwood/servlet/getValue", "raduser", "cardvalue", "sold_transact_no", s.trim());
+        String s2 = gd.getData(_serverPath + "/" + _serverName + "/transServlet", "raduser", s, "display");
+        result = gd.getData(_serverPath + "/" + _serverName + "/getValue", "raduser", "cardvalue", "sold_transact_no", s.trim());
         JPanel jpanel = new JPanel();
         if(s1.compareTo("1") == 0)
             label = new JLabel("Click 'Void' button to cancel transaction");
@@ -233,7 +263,7 @@ public class ScreenC extends JPanel
 
                 public void actionPerformed(ActionEvent actionevent)
                 {
-                    String s3 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/checkSession", "sess");
+                    String s3 = gd.getData(_serverPath + "/" + _serverName + "/checkSession", "sess");
                     if(s3.trim().compareTo("true") == 0)
                     {
                         if(actionevent.getSource() == printbutton)
@@ -262,7 +292,7 @@ public class ScreenC extends JPanel
 
                 public void actionPerformed(ActionEvent actionevent)
                 {
-                    String s3 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/checkSession", "sess");
+                    String s3 = gd.getData(_serverPath + "/" + _serverName + "/checkSession", "sess");
                     if(s3.trim().compareTo("true") == 0)
                     {
                         if(actionevent.getSource() == printbutton)
@@ -275,7 +305,7 @@ public class ScreenC extends JPanel
                             {
                                 textarea.setEnabled(false);
                                 printbutton.setEnabled(false);
-                                String s5 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/processVoiding", transaction, "1800", s4.trim());
+                                String s5 = gd.getData(_serverPath + "/" + _serverName + "/processVoiding", transaction, "1800", s4.trim());
                                 if(s5.trim().compareTo("2") == 0)
                                 {
                                     label.setText("Transaction voided");

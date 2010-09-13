@@ -5,25 +5,54 @@
 
 import java.awt.*;
 import java.awt.print.*;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Properties;
 
 public class printTransaction
     implements Printable
 {
-
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
+	String _serverName;
+	String _serverPath;
+	String _projectName;
+	
     public printTransaction(String s, String s1)
     {
+        try
+        {
+        	_properties = new Properties();
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_projectName = _properties.getProperty("PROJECT_NAME");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");
+        	_projectName = _properties.getProperty("PROJECT_NAME");
+        	_serverName = _properties.getProperty("SERVER_NAME");
+        	_serverPath = _properties.getProperty("SERVER_PATH");
+        	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+        
         i = 0;
         counter = 0;
         gd = new getData();
         transaction = s;
         //String s2 = gd.getData("https://bizweb.globequest.com.ph:8443/pos/servlet/transServlet", "raduser", transaction, "print");
-        String s2 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/transServlet", "raduser", transaction, "print");
+        String s2 = gd.getData(_serverPath + "/" + _serverName + "/transServlet", "raduser", transaction, "print");
         displayed = s2.split(":");
         log = s1;
         if(log.compareTo("A") == 0)
             //gd.getData("https://bizweb.globequest.com.ph:8443/pos/servlet/printerFlag", transaction, "1");
-        	gd.getData("http://192.168.0.112:8080/oakwood/servlet/printerFlag", transaction, "1");
+        	gd.getData(_serverPath + "/" + _serverName + "/printerFlag", transaction, "1");
         printIt();
     }
 
@@ -53,7 +82,7 @@ public class printTransaction
         }
         if(log.compareTo("A") != 0)
             //gd.getData("https://bizweb.globequest.com.ph:8443/pos/servlet/printerFlag", transaction, "2");
-        	gd.getData("http://192.168.0.112:8080/oakwood/servlet/printerFlag", transaction, "2");
+        	gd.getData(_serverPath + "/" + _serverName + "/printerFlag", transaction, "2");
     }
 
     public int print(Graphics g, PageFormat pageformat, int j)
@@ -111,8 +140,8 @@ public class printTransaction
             g.setFont(font1);
             //String s = gd.getData("https://bizweb.globequest.com.ph:8443/pos/servlet/getValue", "wscustomer", "display_username", "wcrealm", displayed[0].trim());
             //String s4 = gd.getData("https://bizweb.globequest.com.ph:8443/pos/servlet/getValue", "wscustomer", "display_password", "wcrealm", displayed[0].trim());
-            String s = gd.getData("http://192.168.0.112:8080/oakwood/servlet/getValue", "wscustomer", "display_username", "wcrealm", displayed[0].trim());
-            String s4 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/getValue", "wscustomer", "display_password", "wcrealm", displayed[0].trim());
+            String s = gd.getData(_serverPath + "/" + _serverName + "/getValue", "wscustomer", "display_username", "wcrealm", displayed[0].trim());
+            String s4 = gd.getData(_serverPath + "/" + _serverName + "/getValue", "wscustomer", "display_password", "wcrealm", displayed[0].trim());
 	        
 	        if(print_switch == 1)
 	        {
@@ -165,7 +194,7 @@ public class printTransaction
 	        Font font2 = new Font("SansSerif", 0, 8);
 	        g.setFont(font2);
 	        //String s7 = gd.getData("https://bizweb.globequest.com.ph:8443/pos/servlet/getValue", "wscustomer", "customer_service", "wcrealm", displayed[0].trim());
-	        String s7 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/getValue", "wscustomer", "customer_service", "wcrealm", displayed[0].trim());        
+	        String s7 = gd.getData(_serverPath + "/" + _serverName + "/getValue", "wscustomer", "customer_service", "wcrealm", displayed[0].trim());        
 	        String s10 = (new StringBuilder()).append("For instruction, pls call ").append(s7).toString();
 	        counter = counter + 5;
 	        g.drawString(s10, 206, counter);

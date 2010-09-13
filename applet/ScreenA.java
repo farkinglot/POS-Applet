@@ -6,16 +6,45 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import javax.swing.*;
 
 public class ScreenA extends JPanel
     implements ActionListener
 {
-
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
+	String _serverName;
+	String _serverPath;
+	String _projectName;
+	
     public ScreenA()
     {
+    	try
+        {
+        	_properties = new Properties();
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_projectName = _properties.getProperty("PROJECT_NAME");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");
+        	_projectName = _properties.getProperty("PROJECT_NAME");
+        	_serverName = _properties.getProperty("SERVER_NAME");
+        	_serverPath = _properties.getProperty("SERVER_PATH");
+        	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+    	
         gd = new getData();
         counter = 0;
         setBackground(new Color(255, 255, 204));
@@ -28,7 +57,7 @@ public class ScreenA extends JPanel
     public Container denominationPanel()
     {
         //String s = gd.getData("https://bizweb.globequest.com.ph:8443/pos/servlet/getBrand", "");
-    	String s = gd.getData("http://192.168.0.112:8080/oakwood/servlet/getBrand", "");
+    	String s = gd.getData(_serverPath + "/" + _serverName + "/getBrand", "");
         String as[] = s.split(":");
         cbp = new JPanel();
         cbp.setBackground(new Color(255, 255, 204));
@@ -49,7 +78,7 @@ public class ScreenA extends JPanel
 
     public void actionPerformed(ActionEvent actionevent)
     {
-        String s = gd.getData("http://192.168.0.112:8080/oakwood/servlet/checkSession", "sess");
+        String s = gd.getData(_serverPath + "/" + _serverName + "/checkSession", "sess");
         if(s.trim().compareTo("true") == 0)
         {
             String s1 = actionevent.getActionCommand();
@@ -66,7 +95,7 @@ public class ScreenA extends JPanel
                 savebutton.setEnabled(false);
                 if(s2.compareTo("") != 0)
                 {
-                    String s4 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/saveData", transactionNumber, s2);
+                    String s4 = gd.getData(_serverPath + "/" + _serverName + "/saveData", transactionNumber, s2);
                     if(s4.trim().compareTo("1") == 0)
                     {
                         JOptionPane.showMessageDialog(null, "Remarks saved", "Message", 1);
@@ -80,7 +109,7 @@ public class ScreenA extends JPanel
                 Pattern pattern = Pattern.compile(s3);
                 String as[] = pattern.split(s1);
                 String s5 = "You choose " + s1 + ". Continue Transaction?";
-                String s6 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/checkAccount", as[0].trim());
+                String s6 = gd.getData(_serverPath + "/" + _serverName + "/checkAccount", as[0].trim());
                 if(s6.compareTo("") != 0)
                 {
                     int i = JOptionPane.showConfirmDialog(this, s5, "Confirmation", 0);
@@ -104,7 +133,7 @@ public class ScreenA extends JPanel
     public Container transactionPanel(String s)
     {
         resultText = s;
-        compiledString = gd.getData("http://192.168.0.112:8080/oakwood/servlet/getTransaction", s, "print");
+        compiledString = gd.getData(_serverPath + "/" + _serverName + "/getTransaction", s, "print");
         printArray = compiledString.split(":");
         JPanel jpanel = new JPanel();
         jpanel.setBackground(new Color(255, 255, 204));
@@ -119,7 +148,7 @@ public class ScreenA extends JPanel
         gridbagconstraints.insets = new Insets(5, 10, 5, 5);
         if(compiledString.compareTo("") != 0)
         {
-            String s1 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/transServlet", "raduser", printArray[3].trim(), "display");
+            String s1 = gd.getData(_serverPath + "/" + _serverName + "/transServlet", "raduser", printArray[3].trim(), "display");
             transactionNumber = printArray[3].trim();
             display = s1.split(":");
             gridbagconstraints.anchor = 13;
@@ -203,7 +232,7 @@ public class ScreenA extends JPanel
 
             public void actionPerformed(ActionEvent actionevent)
             {
-                String s2 = gd.getData("http://192.168.0.112:8080/oakwood/servlet/checkSession", "sess");
+                String s2 = gd.getData(_serverPath + "/" + _serverName + "/checkSession", "sess");
                 if(s2.trim().compareTo("true") == 0)
                 {
                     if(actionevent.getSource() == printbutton)
