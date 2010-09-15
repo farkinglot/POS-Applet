@@ -5,10 +5,17 @@
 
 import java.io.*;
 import java.sql.*;
+import java.util.Properties;
+
 import javax.servlet.http.*;
 
 public class checkAccount extends HttpServlet
 {
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
 
     public checkAccount()
     {
@@ -51,12 +58,29 @@ public class checkAccount extends HttpServlet
             System.err.print("ClassNotFoundException: ");
             System.err.println(classnotfoundexception.getMessage());
         }
+        
+        // 2010-09-15: Added by Ridvan Baluyos
+        _properties = new Properties();
+        try
+        {        	
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");     	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+        
         try
         {
             //Connection connection = DriverManager.getConnection("jdbc:mysql://bizdb.globequest.com.ph/prepaidbiz", "fortknox", "f0rtkn0x");
-        	Connection connection = DriverManager.getConnection("jdbc:mysql://172.16.2.190/prepaidbiz", "caddev", "c@dd3v");
+        	Connection connection = DriverManager.getConnection("jdbc:mysql://" + _dbhost + "/" + _dbname, _dbuser, _dbpassword);
             Statement statement = connection.createStatement();
-            String s2 = "SELECT * FROM raduser WHERE cardvalue='" + as[0].trim() + "' && wcrealm='" + realm + "' && batchstatus='A' && acctstatus='S' && prepaidtype='P' && sold_flag='N'";
+            String s2 = "SELECT * FROM raduser WHERE cardvalue='" + as[0].trim() + "' && reseller_id='" + realm + "' && batchstatus='A' && acctstatus='S' && prepaidtype='P' && sold_flag='N'";
+            System.out.println(s2);
             ResultSet resultset = statement.executeQuery(s2);
             if(resultset.next())
                 printwriter.println("available");

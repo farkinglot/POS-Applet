@@ -7,10 +7,17 @@ import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
+
 import javax.servlet.http.*;
 
 public class getTransaction extends HttpServlet
 {
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
 
     public getTransaction()
     {
@@ -62,10 +69,26 @@ public class getTransaction extends HttpServlet
             System.err.print("ClassNotFoundException: ");
             System.err.println(classnotfoundexception.getMessage());
         }
+        
+        // 2010-09-15: Added by Ridvan Baluyos
+        _properties = new Properties();
+        try
+        {        	
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");     	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+        
         try
         {
             //Connection connection = DriverManager.getConnection("jdbc:mysql://bizdb.globequest.com.ph/prepaidbiz", "fortknox", "f0rtkn0x");
-        	Connection connection = DriverManager.getConnection("jdbc:mysql://172.16.2.190/prepaidbiz", "caddev", "c@dd3v");
+        	Connection connection = DriverManager.getConnection("jdbc:mysql://" + _dbhost + "/" + _dbname, _dbuser, _dbpassword);
             Statement statement = connection.createStatement();
             String s4 = "SELECT counter FROM transaction_counter WHERE transtime=curdate()";
             ResultSet resultset = statement.executeQuery(s4);
@@ -87,7 +110,8 @@ public class getTransaction extends HttpServlet
             transaction_no = s6 + transaction_number;
             statement.executeUpdate("UPDATE transaction_counter SET counter='" + trans_count + "',transtime=curdate()");
             resultset.close();
-            String s9 = "SELECT batchnum, batchstatus, serialnum, currency, cardvalue, username, password, accttype, allocated_time, allocated_days, date_add(now(), interval shelf_days day) as compdate from raduser where cardvalue='" + as[0].trim() + "' && batchstatus='A' && acctstatus='S' && prepaidtype='P' && sold_flag='N' && wcrealm='" + realm + "' order by date_created, serialnum LIMIT 1";
+            String s9 = "SELECT batchnum, batchstatus, serialnum, currency, cardvalue, username, password, accttype, allocated_time, allocated_days, date_add(now(), interval shelf_days day) AS compdate FROM raduser WHERE cardvalue='" + as[0].trim() + "' && batchstatus='A' && acctstatus='S' && prepaidtype='P' && sold_flag='N' && reseller_id='" + realm + "' ORDER BY date_created, serialnum LIMIT 1";
+            System.out.println(s9);
             ResultSet resultset1 = statement.executeQuery(s9);
             if(resultset1.next())
             {
@@ -120,7 +144,7 @@ public class getTransaction extends HttpServlet
                 date_shelf_format = date_shelf_format.replaceAll(":", "");
                 String s20 = "UPDATE raduser set sold_transact_no='" + transaction_no + "', sold_by='" + name + "', sold_date='" + s + "', sold_ipaddress='" + ip_add + "', sold_flag='Y', acctstatus='U', date_shelfexpiry='" + s19 + "'  where serialnum='" + s12 + "' && username='" + s15 + "' && wcrealm='" + realm + "' && password='" + s16 + "'";
                 statement.executeUpdate(s20);
-                String s21 = "INSERT INTO sales_log (trans_dt, trans_no, trans_type, acct_type, trans_realm, acct_batchno, batch_status, acct_serialnum, acct_userid, acct_status, trans_currency, trans_value, trans_by, trans_ip, reseller_id) VALUES ('" + s1 + "', '" + transaction_no + "', 'POS_SALES', '" + s17 + "', '" + realm + "', '" + s11 + "', '" + s10 + "', '" + s12 + "', '" + s15 + "', 'U', '" + s13 + "', '" + s14 + "', '" + name + "', '" + ip_add + "', '" + reseller + "')";
+                String s21 = "INSERT INTO salesreport (trans_dt, trans_no, trans_type, acct_type, trans_realm, acct_batchno, batch_status, acct_serialnum, acct_userid, acct_status, trans_currency, trans_value, trans_by, trans_ip, reseller_id) VALUES ('" + s1 + "', '" + transaction_no + "', 'POS_SALES', '" + s17 + "', '" + realm + "', '" + s11 + "', '" + s10 + "', '" + s12 + "', '" + s15 + "', 'U', '" + s13 + "', '" + s14 + "', '" + name + "', '" + ip_add + "', '" + reseller + "')";
                 statement.executeUpdate(s21);
                 printwriter.println(realm + ":");
                 printwriter.println(s12 + ":");
@@ -136,10 +160,10 @@ public class getTransaction extends HttpServlet
                 printwriter.println(date_shelf_format + ":");
                 printwriter.println(name + ":");
                 printwriter.println(s + ":");
-                statement.executeUpdate("INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','sell account-transaction #" + transaction_no + "','ok')");
+                statement.executeUpdate("INSERT INTO poslog (transtd,ipaddress,wcrealm,user,actiontaken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','sell account-transaction #" + transaction_no + "','ok')");
             } else
             {
-                statement.executeUpdate("INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','sell account failed','Failed')");
+                statement.executeUpdate("INSERT INTO poslog (transtd,ipaddress,wcrealm,user,actiontaken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','sell account failed','Failed')");
             }
             resultset1.close();
             statement.close();

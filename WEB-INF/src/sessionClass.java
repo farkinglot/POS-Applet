@@ -3,11 +3,18 @@
 // Decompiler options: packimports(3) 
 // Source File Name:   sessionClass.java
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.*;
+import java.util.Properties;
 
 public class sessionClass
 {
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
 
     public sessionClass()
     {
@@ -25,20 +32,36 @@ public class sessionClass
             System.err.print("ClassNotFoundException: ");
             System.err.println(classnotfoundexception.getMessage());
         }
+        
+        // 2010-09-15: Added by Ridvan Baluyos
+        _properties = new Properties();
+        try
+        {        	
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");     	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+        
         try
         {
             //Connection connection = DriverManager.getConnection("jdbc:mysql://bizdb.globequest.com.ph/prepaidbiz", "fortknox", "f0rtkn0x");
-        	Connection connection = DriverManager.getConnection("jdbc:mysql://172.16.2.190/prepaidbiz", "caddev", "c@dd3v");
+        	Connection connection = DriverManager.getConnection("jdbc:mysql://" + _dbhost + "/" + _dbname, _dbuser, _dbpassword);
             Statement statement = connection.createStatement();
             long l = System.currentTimeMillis() / 1000L;
-            String s3 = "SELECT * from active_session where sessionid='" + s + "' && ipaddress='" + s2 + "' && username='" + s1 + "'";
+            String s3 = "SELECT * from customersession where sessionid='" + s + "' && ipaddress='" + s2 + "' && username='" + s1 + "'";
             ResultSet resultset = statement.executeQuery(s3);
             if(resultset.next())
             {
                 long l1 = Long.parseLong(resultset.getString("lastused"));
                 if(l - l1 <= 900L)
                 {
-                    String s4 = "UPDATE active_session set lastused='" + l + "' where sessionid='" + s + "'";
+                    String s4 = "UPDATE customersession set lastused='" + l + "' where sessionid='" + s + "'";
                     statement.executeUpdate(s4);
                     value = true;
                 } else

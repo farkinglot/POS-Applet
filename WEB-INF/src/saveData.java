@@ -5,11 +5,17 @@
 
 import java.io.*;
 import java.sql.*;
+import java.util.Properties;
 
 import javax.servlet.http.*;
 
 public class saveData extends HttpServlet
 {
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
 
     public saveData()
     {
@@ -50,10 +56,26 @@ public class saveData extends HttpServlet
             System.err.print("ClassNotFoundException: ");
             System.err.println(classnotfoundexception.getMessage());
         }
+        
+        // 2010-09-15: Added by Ridvan Baluyos
+        _properties = new Properties();
+        try
+        {        	
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");     	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+        
         try
         {
             //Connection connection = DriverManager.getConnection("jdbc:mysql://bizdb.globequest.com.ph/prepaidbiz", "fortknox", "f0rtkn0x");
-        	Connection connection = DriverManager.getConnection("jdbc:mysql://172.16.2.190/prepaidbiz", "caddev", "c@dd3v");
+        	Connection connection = DriverManager.getConnection("jdbc:mysql://" + _dbhost + "/" + _dbname, _dbuser, _dbpassword);
             Statement statement = connection.createStatement();
             String s2 = "SELECT * from raduser where sold_transact_no='" + as[0].trim() + "' && sold_flag='Y'";
             ResultSet resultset = statement.executeQuery(s2);
@@ -61,7 +83,7 @@ public class saveData extends HttpServlet
             {
                 String s3 = "UPDATE raduser set pos_remarks = '" + as[1].trim() + "' where sold_transact_no='" + as[0].trim() + "'";
                 statement.executeUpdate(s3);
-                String s4 = "UPDATE sales_log set remarks = '" + as[1].trim() + "' where trans_no='" + as[0].trim() + "' && acct_status = 'U'";
+                String s4 = "UPDATE salesreport set remarks = '" + as[1].trim() + "' where trans_no='" + as[0].trim() + "' && acct_status = 'U'";
                 statement.executeUpdate(s4);
                 printwriter.println("1");
             } else

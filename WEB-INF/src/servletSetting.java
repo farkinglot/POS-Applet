@@ -1,3 +1,5 @@
+import java.util.Properties;
+
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
@@ -6,6 +8,11 @@
 
 class servletSetting
 {
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
 
     servletSetting()
     {

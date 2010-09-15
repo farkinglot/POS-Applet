@@ -5,7 +5,7 @@
 	//String database = "jdbc:mysql://202.52.162.26/prepaidbiz";
 	//String access = "pbiz";
 	//String password = "prepaidbiz";
-	String database = "jdbc:mysql://172.16.2.190/prepaidbiz";
+	String database = "jdbc:mysql://172.16.2.190/prepaidwiz";
 	String access = "caddev";
 	String password = "c@dd3v";
 	int sessionValidity = 900;
@@ -15,7 +15,8 @@
         Class.forName(driver);
         Connection Conn = DriverManager.getConnection(database, access, password);
         Statement stmt = Conn.createStatement();
-        String sql = "select * from posvalidip where ip_address = '" + ip_add + "' && enabled='Y'";
+        String sql = "SELECT * FROM posvalidip WHERE ip_address = '" + ip_add + "' && enabled='Y'";
+        System.out.println(sql);
         ResultSet rs = stmt.executeQuery(sql);
         if (rs.next()){
             value=true;
@@ -33,7 +34,7 @@
 		Class.forName(driver);
         Connection Conn = DriverManager.getConnection(database, access, password);
         Statement stmt = Conn.createStatement();
-        String sql = "SELECT a.* FROM posuser as a INNER JOIN posvalidip as b ON a.wcrealm = b.wcrealm WHERE binary a.username='"+strUsername+"' && binary a.password='"+strPassword+"' && a.enabled='Y' && a.wcrealm='"+strRealm+"' && b.ip_address='"+ipadd+"'";
+        String sql = "SELECT a.* FROM posuser as a INNER JOIN posvalidip as b USING(reseller_id) WHERE binary a.username='"+strUsername+"' && binary a.password='"+strPassword+"' && a.enabled='Y' && a.reseller_id='"+strRealm+"' && b.ip_address='"+ipadd+"'";
         System.out.println(sql);
         ResultSet rs = stmt.executeQuery(sql);
         if (rs.next()){
@@ -52,10 +53,11 @@
         Class.forName(driver);
         Connection conn = DriverManager.getConnection(database, access, password);
         Statement stmt = conn.createStatement();
-        String query = "select userid from posuser where binary username = '" + strUsername + "' && binary password='" + strPassword + "' && wcrealm='"+strRealm+"'";
+        String query = "SELECT username FROM posuser WHERE binary username = '" + strUsername + "' && binary password='" + strPassword + "' && reseller_id='"+strRealm+"'";
+        System.out.println(query);
         ResultSet rs = stmt.executeQuery(query);
         while(rs.next()) {
-          username=rs.getString("userid");
+          username=rs.getString("username");
         }
         rs.close();
         stmt.close();
@@ -68,7 +70,7 @@
         Class.forName(driver);
         Connection conn = DriverManager.getConnection(database, access, password);
         Statement stmt = conn.createStatement();
-        String query = "select "+fieldName+" from "+tableName+" where binary "+keyName+" = '" + keyValue + "'";
+        String query = "SELECT "+fieldName+" FROM "+tableName+" WHERE binary "+keyName+" = '" + keyValue + "'";
         ResultSet rs = stmt.executeQuery(query);
         while(rs.next()) {
           value=rs.getString(fieldName);
@@ -119,13 +121,13 @@
 		Class.forName(driver);
         Connection Conn = DriverManager.getConnection(database, access, password);
         Statement stmt = Conn.createStatement();
-        String query = "SELECT * from active_session where username='"+username+"'";
+        String query = "SELECT * from customersession where username='"+username+"'";
         ResultSet rs = stmt.executeQuery(query);
         if(rs.next()) {
-          String sql = "UPDATE active_session set sessionid='"+sessid+"', ipaddress='"+ip_address+"', wcrealm='"+realm+"', lastused='"+lastused+"' where username='"+username+"'";
+          String sql = "UPDATE customersession set sessionid='"+sessid+"', ipaddress='"+ip_address+"', wcrealm='"+realm+"', lastused='"+lastused+"' where username='"+username+"'";
           stmt.executeUpdate(sql);
         } else {
-	      String sql = "INSERT INTO active_session (sessionid, ipaddress, username, lastused, wcrealm) VALUES ('"+sessid+"','"+ip_address+"','"+username+"','"+lastused+"','"+realm+"')";    
+	      String sql = "INSERT INTO customersession (sessionid, ipaddress, username, lastused, wcrealm) VALUES ('"+sessid+"','"+ip_address+"','"+username+"','"+lastused+"','"+realm+"')";    
 	      stmt.executeUpdate(sql);
         }
         rs.close();
@@ -140,12 +142,12 @@
 		Class.forName(driver);
         Connection Conn = DriverManager.getConnection(database, access, password);
         Statement stmt = Conn.createStatement();
-        String query = "SELECT * from active_session where sessionid='"+sessionId+"' && ipaddress='"+ip_address+"'";
+        String query = "SELECT * from customersession where sessionid='"+sessionId+"' && ipaddress='"+ip_address+"'";
         ResultSet rs = stmt.executeQuery(query);
         if(rs.next()) {
            long lastused=Long.parseLong(rs.getString("lastused"));
            if((time-lastused) <= sessionValidity) {
-	           String statement = "UPDATE active_session set lastused='"+time+"' where sessionid='"+sessionId+"'";
+	           String statement = "UPDATE customersession set lastused='"+time+"' where sessionid='"+sessionId+"'";
 	           stmt.executeUpdate(statement);
 	           value=true;
            } else {
@@ -165,7 +167,7 @@
 		Class.forName(driver);
         Connection Conn = DriverManager.getConnection(database, access, password);
         Statement stmt = Conn.createStatement();
-        String sql = "INSERT INTO pos_invalid_access (transaction_time, ip_address,username,password,browser,remarks,ostype) values (now(),'"+ip+"','"+username+"','"+pwd+"','"+browser+"','"+remarks+"','"+osValue+"')";
+        String sql = "INSERT INTO posinvalidaccess (transaction_time, ip_address,username,password,browser,remarks,ostype) values (now(),'"+ip+"','"+username+"','"+pwd+"','"+browser+"','"+remarks+"','"+osValue+"')";
         stmt.executeUpdate(sql);
         stmt.close();
         Conn.close();

@@ -27,11 +27,11 @@ public class posApplet extends JApplet
 	
     public posApplet()
     {
-        gd = new getData();        
+        gd = new getData();
+        _properties = new Properties();
         
         try
-        {
-        	_properties = new Properties();
+        {        	
         	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../lib/pos.properties"));
         	_dbhost = _properties.getProperty("DBHOST");
         	_dbname = _properties.getProperty("DBNAME");
@@ -40,8 +40,7 @@ public class posApplet extends JApplet
         	_dbpassword = _properties.getProperty("DBPASSWORD");
         	_projectName = _properties.getProperty("PROJECT_NAME");
         	_serverName = _properties.getProperty("SERVER_NAME");
-        	_serverPath = _properties.getProperty("SERVER_PATH");
-        	
+        	_serverPath = _properties.getProperty("SERVER_PATH");        	
         }
         catch (IOException e)
         {

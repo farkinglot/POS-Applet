@@ -7,10 +7,17 @@ import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
+
 import javax.servlet.http.*;
 
 public class processVoiding extends HttpServlet
 {
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
 
     public processVoiding()
     {
@@ -58,10 +65,25 @@ public class processVoiding extends HttpServlet
             System.err.print("ClassNotFoundException: ");
             System.err.println(classnotfoundexception.getMessage());
         }
+        
+        // 2010-09-15: Added by Ridvan Baluyos
+        _properties = new Properties();
+        try
+        {        	
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");     	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
         try
         {
             //Connection connection = DriverManager.getConnection("jdbc:mysql://bizdb.globequest.com.ph/prepaidbiz", "fortknox", "f0rtkn0x");
-        	Connection connection = DriverManager.getConnection("jdbc:mysql://172.16.2.190/prepaidbiz", "caddev", "c@dd3v");
+        	Connection connection = DriverManager.getConnection("jdbc:mysql://" + _dbhost + "/" + _dbname, _dbuser, _dbpassword);
             Statement statement = connection.createStatement();
             String s4 = "SELECT *, unix_timestamp(sold_date) FROM raduser where wcrealm='" + wcrealm + "' && sold_transact_no='" + as[0].trim() + "' && sold_flag='Y'";
             ResultSet resultset = statement.executeQuery(s4);
@@ -97,12 +119,12 @@ public class processVoiding extends HttpServlet
                 if(resultset1.next())
                 {
                     printwriter.println("1");
-                    statement.executeUpdate("INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-user is online','Failed') ");
+                    statement.executeUpdate("INSERT INTO poslog (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-user is online','Failed') ");
                 } else
                 {
                     statement.executeUpdate("UPDATE raduser SET acctstatus='V',sold_flag='V', void_ipaddress='" + ip_add + "', voided_by='" + userid + "',void_date='" + s + "',voidreason='" + as[2].trim() + "' where sold_transact_no='" + as[0].trim() + "' && sold_flag='Y' && username='" + username + "'");
-                    statement.executeUpdate("UPDATE sales_log SET trans_dt='" + s1 + "',trans_type='POS_VOID', acct_status='V', trans_by='" + name + "', trans_ip='" + ip_add + "', remarks='" + as[2].trim() + "' where trans_no='" + as[0].trim() + "' && acct_userid='" + username + "' && trans_realm='" + realm + "'");
-                    statement.executeUpdate("INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + "','ok' )");
+                    statement.executeUpdate("UPDATE salesreport SET trans_dt='" + s1 + "',trans_type='POS_VOID', acct_status='V', trans_by='" + name + "', trans_ip='" + ip_add + "', remarks='" + as[2].trim() + "' where trans_no='" + as[0].trim() + "' && acct_userid='" + username + "' && trans_realm='" + realm + "'");
+                    statement.executeUpdate("INSERT INTO poslog (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + "','ok' )");
                     printwriter.println("2");
                 }
                 resultset1.close();
@@ -110,16 +132,16 @@ public class processVoiding extends HttpServlet
             if(result.compareTo("2") == 0)
             {
                 printwriter.println("4");
-                statement.executeUpdate("INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-account already used','Failed' )");
+                statement.executeUpdate("INSERT INTO poslog (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-account already used','Failed' )");
             } else
             if(result.compareTo("3") == 0)
             {
                 printwriter.println("3");
-                statement.executeUpdate("INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-time expired','Failed' )");
+                statement.executeUpdate("INSERT INTO poslog (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-time expired','Failed' )");
             } else
             {
                 printwriter.println("0");
-                statement.executeUpdate("INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-invalid transaction number','Failed') ");
+                statement.executeUpdate("INSERT INTO poslog (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + wcrealm + "','" + name + "','void account " + as[0].trim() + " failed-invalid transaction number','Failed') ");
             }
             statement.close();
             connection.close();

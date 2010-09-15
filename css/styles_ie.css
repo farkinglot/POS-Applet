@@ -1,0 +1,36 @@
+.txtbutton{padding:2px; margin:0; top:1px; height:18px;}
+
+.titlebutton{top:-3px;}
+
+fieldset{padding:0 15px 5px 5px; border:#C8E0EA solid 1px;}
+	.fldset_internal{background-color:#E3EEFC;}
+	legend{font-weight:bold;}	
+	
+/* Start of Browse File Input and Button*/
+	#divinputfile{
+	 background:url(../img/b1.gif) no-repeat 100%;
+	 height:25px;
+	 width:315px;
+	 padding:0px;
+	 margin:0px;
+	}
+	
+		#divinputfile:hover{
+		 background:url(../img/b2.gif) no-repeat 100%;
+		}
+	
+	#divinputfile #filepc{
+	 opacity: 0;
+	 -moz-opacity: 0;
+	 filter: alpha(opacity=0);
+	 font-size:11px;
+	}
+	 
+	#fakeinputfile{
+	 margin-top:-18px;
+	}
+	
+	#fakeinputfile #fakefilepc{
+	border:#999 solid 1px; color:#666; background-color:#fff; height:16px; font-size:11px; font-family:Verdana, Arial, Helvetica, sans-serif; padding-top:2px; width:265px;
+	}
+/* End of Browse File Input and Button*/	

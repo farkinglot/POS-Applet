@@ -1,0 +1,12 @@
+.login_container{ background:url(../img/login_box.png) no-repeat left top; width:338px; height:191px;}
+
+.login_input {background-color:#FFFFFF; border:1px solid #999999; color:#666666; font-family:Verdana,Arial,Helvetica,sans-serif; font-size:12px; height:17px; padding-top:2px; width:190px;}
+.login_box{ margin: 0 auto; color:#FFFFFF; }
+
+h1 {
+color:#08ABE6;
+height:50px;
+font-family:Arial;
+width:330px;
+text-align:center;
+}

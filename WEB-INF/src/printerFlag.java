@@ -5,11 +5,17 @@
 
 import java.io.*;
 import java.sql.*;
+import java.util.Properties;
 
 import javax.servlet.http.*;
 
 public class printerFlag extends HttpServlet
 {
+	Properties _properties;
+	String _dbhost;
+	String _dbname;
+	String _dbuser;
+	String _dbpassword;
 
     public printerFlag()
     {
@@ -55,20 +61,36 @@ public class printerFlag extends HttpServlet
             System.err.print("ClassNotFoundException: ");
             System.err.println(classnotfoundexception.getMessage());
         }
+        
+        // 2010-09-15: Added by Ridvan Baluyos
+        _properties = new Properties();
+        try
+        {        	
+        	_properties.load(this.getClass().getClassLoader().getResourceAsStream("../../lib/pos.properties"));
+        	_dbhost = _properties.getProperty("DBHOST");
+        	_dbname = _properties.getProperty("DBNAME");
+        	_dbuser = _properties.getProperty("DBUSER");
+        	_dbpassword = _properties.getProperty("DBPASSWORD");     	
+        }
+        catch (IOException e)
+        {
+        	e.printStackTrace();
+        }
+        
         try
         {
             //Connection connection = DriverManager.getConnection("jdbc:mysql://bizdb.globequest.com.ph/prepaidbiz", "fortknox", "f0rtkn0x");
-        	Connection connection = DriverManager.getConnection("jdbc:mysql://172.16.2.190/prepaidbiz", "caddev", "c@dd3v");
+        	Connection connection = DriverManager.getConnection("jdbc:mysql://" + _dbhost + "/" + _dbname, _dbuser, _dbpassword);
             Statement statement = connection.createStatement();
             String s2 = "";
             if(as[1].trim().compareTo("1") == 0)
             {
                 s2 = "UPDATE raduser SET printed_flag='Y' where sold_transact_no='" + as[0].trim() + "' && sold_flag='Y'";
-                String s3 = "INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','print sold transaction " + as[0].trim() + "','ok') ";
+                String s3 = "INSERT INTO poslog (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','print sold transaction " + as[0].trim() + "','ok') ";
                 statement.executeUpdate(s3);
             } else
             if(as[1].trim().compareTo("2") == 0)
-                s2 = "INSERT INTO pos_log (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','reprint transaction " + as[0].trim() + "','ok') ";
+                s2 = "INSERT INTO poslog (transaction_time,ip_address,wcrealm,user,action_taken,status) VALUES (now(),'" + ip_add + "','" + realm + "','" + name + "','reprint transaction " + as[0].trim() + "','ok') ";
             statement.executeUpdate(s2);
             statement.close();
             connection.close();

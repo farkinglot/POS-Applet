@@ -1,7 +1,7 @@
 <%@include file="./lib/checkSession.jsp" %>
 <html>
 	<head>
-	<title>::Globe Quest::</title>
+	<title>WIZ POS</title>
 	<link rel="stylesheet" href="./lib/style.css" type="text/css"> 
 	</head>
 	<body>
